@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams, HttpStatusCode } from '@angular/common/http';
 
 import { createProductDTO, Product, updateProductDTO } from './../models/product.model';
-import {retry, repeatWhen, catchError} from 'rxjs/operators';
+import {retry, repeatWhen, catchError, map} from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { throwError } from 'rxjs';
+import { throwError, zip } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
@@ -24,8 +24,14 @@ private apiUrl = environment.api_url+"/api/products/";
     }
     return this.http.get<Product[]>(this.apiUrl, {params})
     .pipe(
-      retry(3) //permite reiintentar la peticion hasta 3 veces antes del error 
-    );	
+      retry(3), //permite reiintentar la peticion hasta 3 veces antes del error 
+      map(products =>products.map(item =>{
+        return{
+          ...item,
+          taxes : .19 * item.price //agrego el nuevo valor con el map 
+        }
+      }))//map permite evaluar cada uno de los valores del observable para transformarlo 
+      );	
   }
  
   getProduct(id:String) {
@@ -71,5 +77,13 @@ private apiUrl = environment.api_url+"/api/products/";
       params:{limit,offset}
     });	
 
+  }
+
+  fetchAndUpdate (id: string ,dto:updateProductDTO ){
+//zip es para ejecutar varias peticiones a la vez q no son dependientes, y la rta es una array con cada response de las peticiones 
+    return zip(
+      this.getProduct(id),
+      this.update(dto,id)
+    )
   }
 }
