@@ -7,6 +7,7 @@
     (showProduct)="onShowDetail($event)"
   ></app-product>
 </div>
+<button (click)="loadMore()">Cargar mas</button>
 
 
 <div *ngIf="productChosen"  class="product-detail" [class.active]="showProductDetail  ">
