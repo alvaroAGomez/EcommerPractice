@@ -4,7 +4,7 @@ export interface Product {
   price: number;
   images: string [];
   description: string;
-  category: Category;
+  category?: Category;
 }
 
 export interface Category{
@@ -16,3 +16,7 @@ export interface Category{
 export interface createProductDTO extends Omit<Product,'id'|'category'>{
   categoryId: number;
 }
+
+
+//Partial hace q todos los atributos sean opcionales
+export interface updateProductDTO extends Partial<createProductDTO>{}

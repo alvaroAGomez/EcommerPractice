@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { createProductDTO, Product } from './../models/product.model';
+import { createProductDTO, Product, updateProductDTO } from './../models/product.model';
 
 @Injectable({
   providedIn: 'root'
@@ -23,4 +23,14 @@ private apiUrl = "https://young-sands-07814.herokuapp.com/api/products/";
   create(dto:createProductDTO) {
     return this.http.post<Product>(this.apiUrl, dto);	
   }
+
+
+  //con put se envia todo el cuerpo del product
+  //con patch solo se envia los atributos modificados
+
+  update(dto:updateProductDTO, id:string) {
+    return this.http.put<Product>(this.apiUrl+id, dto);	
+  }
+
+  
 }

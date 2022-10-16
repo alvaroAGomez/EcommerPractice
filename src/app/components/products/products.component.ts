@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { createProductDTO, Product } from '../../models/product.model';
+import { createProductDTO, Product, updateProductDTO } from '../../models/product.model';
 
 import { StoreService } from '../../services/store.service';
 import { ProductsService } from '../../services/products.service';
@@ -72,5 +72,21 @@ createNewProduct(){
     this.products.unshift(res);//agrega en la primera posicion
   })
 }
+
+
+updateProduct(){
+  const changes : updateProductDTO={
+    title:'Esto es un cambio'
+  };
+  const id = this.productChosen.id;
+  this.productsService.update(changes, id).subscribe(res=>{
+    console.log(res);
+    const productIndex =  this.products.findIndex(item=>item.id === this.productChosen.id);
+    this.products[productIndex] = res;
+    this.productChosen = res;
+  })
+
+}
+
 
 }
