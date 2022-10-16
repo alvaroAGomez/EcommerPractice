@@ -60,6 +60,10 @@ export class ProductsComponent implements OnInit {
     this.productsService.getProduct(id).subscribe(res=>{
       this.toggleProductDetail();
       this.productChosen = res;
+    },errorMsg=>{
+      window.alert(errorMsg)
+      console.log(errorMsg);
+      
     })
    }
 
