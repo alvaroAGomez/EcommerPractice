@@ -8,4 +8,12 @@ export class TokenService {
   private apiUrl = environment.api_url+"/api/products/";
 
   constructor() { }
+
+  saveToke(token:string){
+    localStorage.setItem("token",token);
+  }
+
+  getToken(){
+    return localStorage.getItem("token");
+  }
 }

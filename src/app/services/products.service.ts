@@ -5,6 +5,7 @@ import { createProductDTO, Product, updateProductDTO } from './../models/product
 import {retry, repeatWhen, catchError, map} from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { throwError, zip } from 'rxjs';
+import { checktime } from '../interceptors/time.interceptor';
 @Injectable({
   providedIn: 'root'
 })
@@ -12,7 +13,8 @@ export class ProductsService {
 
 private apiUrl = environment.api_url+"/api/products/";
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    
   ) { }
 
   getAllProducts(limit?:number, offset?:number) {
@@ -22,7 +24,7 @@ private apiUrl = environment.api_url+"/api/products/";
       params = params.set('offset', offset)
 
     }
-    return this.http.get<Product[]>(this.apiUrl, {params})
+    return this.http.get<Product[]>(this.apiUrl, {params, context:checktime()})
     .pipe(
       retry(3), //permite reiintentar la peticion hasta 3 veces antes del error 
       map(products =>products.map(item =>{
