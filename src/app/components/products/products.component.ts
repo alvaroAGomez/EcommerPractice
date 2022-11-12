@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import {
   createProductDTO,
@@ -17,24 +17,16 @@ import { zip } from 'rxjs';
   styleUrls: ['./products.component.scss'],
 })
 export class ProductsComponent implements OnInit {
+
   myShoppingCart: Product[] = [];
   total = 0;
-  products: Product[] = [];
-  showProductDetail: boolean = false;
-  productChosen: Product = {
-    id: '',
-    price: 0,
-    images: [],
-    title: '',
-    category: {
-      id: '',
-      name: '',
-    },
-    description: '',
-  };
+  
+  @Input() products: Product[] = [];
+  @Output() loadMore = new EventEmitter();
 
-  limit: number = 10;
-  offset: number = 0;
+  showProductDetail: boolean = false;
+  productChosen: Product | null =null;
+
 
   constructor(
     private storeService: StoreService,
@@ -44,10 +36,7 @@ export class ProductsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.productsService.getAllProducts(10, 0).subscribe((data) => {
-      this.products = data;
-      this.offset += this.limit;
-    });
+  
   }
 
   onAddToShoppingCart(product: Product) {
@@ -87,39 +76,39 @@ export class ProductsComponent implements OnInit {
   }
 
   updateProduct() {
-    const changes: updateProductDTO = {
-      title: 'Esto es un cambio',
-    };
-    const id = this.productChosen.id;
-    this.productsService.update(changes, id).subscribe((res) => {
-      console.log(res);
-      const productIndex = this.products.findIndex(
-        (item) => item.id === this.productChosen.id
-      );
-      this.products[productIndex] = res;
-      this.productChosen = res;
-    });
+    if(this.productChosen){
+      const changes: updateProductDTO = {
+        title: 'Esto es un cambio',
+      };
+      const id = this.productChosen?.id;
+      this.productsService.update(changes, id).subscribe((res) => {
+        const productIndex = this.products.findIndex(
+          (item) => item.id === this.productChosen?.id
+        );
+        this.products[productIndex] = res;
+        this.productChosen = res;
+      });
+    }
+
   }
 
   deleteProduct() {
-    const id = this.productChosen.id;
+    if(this.productChosen){
+      const id = this.productChosen?.id;
 
-    this.productsService.delete(id).subscribe((res) => {
-      const productIndex = this.products.findIndex(
-        (item) => item.id === this.productChosen.id
-      );
-      this.products.splice(productIndex, 1);
-      this.showProductDetail = false;
-    });
+      this.productsService.delete(id).subscribe((res) => {
+        const productIndex = this.products.findIndex(
+          (item) => item.id === this.productChosen?.id
+        );
+        this.products.splice(productIndex, 1);
+        this.showProductDetail = false;
+      });
+    }
+
   }
 
-  loadMore() {
-    this.productsService
-      .getProductsByPage(this.limit, this.offset)
-      .subscribe((res) => {
-        this.products = this.products.concat(res);
-        this.offset += this.limit;
-      });
+  onLoadMore() {
+    this.loadMore.emit();
   }
 
   //para evitar el callback hell, utilizo un pipe y despues el switchmap para hacer todas las peticiones necesarias

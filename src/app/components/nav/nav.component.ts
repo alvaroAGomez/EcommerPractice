@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { Category } from 'src/app/models/product.model';
 import { User } from 'src/app/models/user.model';
 import { AuthService } from 'src/app/services/auth.service';
+import { CategoriesService } from 'src/app/services/categories.service';
 import { UsersService } from 'src/app/services/users.service';
 
 import { StoreService } from '../../services/store.service'
@@ -15,18 +17,27 @@ export class NavComponent implements OnInit {
   activeMenu = false;
   counter = 0;
   profile :User |null = null;
+  categories :Category[] =[];
 
   constructor(
     private storeService: StoreService,
     private authService: AuthService, 
-    private userService: UsersService
+    private userService: UsersService,
+    private categoryService: CategoriesService
   ) { }
 
   ngOnInit(): void {
     this.storeService.myCart$.subscribe(products => {
       this.counter = products.length;
     });
+    this.getAllCategories();
   }
+
+getAllCategories(){
+  this.categoryService.getAllProducts().subscribe(res=>{
+    this.categories = res;
+  })
+}
 
   toggleMenu() {
     this.activeMenu = !this.activeMenu;

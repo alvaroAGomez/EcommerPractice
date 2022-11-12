@@ -11,7 +11,7 @@ import { checktime } from '../interceptors/time.interceptor';
 })
 export class ProductsService {
 
-private apiUrl = environment.api_url+"/api/products/";
+private apiUrl = environment.api_url;
   constructor(
     private http: HttpClient,
     
@@ -24,7 +24,7 @@ private apiUrl = environment.api_url+"/api/products/";
       params = params.set('offset', offset)
 
     }
-    return this.http.get<Product[]>(this.apiUrl, {params, context:checktime()})
+    return this.http.get<Product[]>(this.apiUrl+"/api/products/", {params, context:checktime()})
     .pipe(
       retry(3), //permite reiintentar la peticion hasta 3 veces antes del error 
       map(products =>products.map(item =>{
@@ -37,7 +37,7 @@ private apiUrl = environment.api_url+"/api/products/";
   }
  
   getProduct(id:String) {
-    return this.http.get<Product>(this.apiUrl+id)
+    return this.http.get<Product>(this.apiUrl+"/api/products/"+id)
     .pipe(
       catchError((error: HttpErrorResponse) => {
         
@@ -59,7 +59,7 @@ private apiUrl = environment.api_url+"/api/products/";
   }
 
   create(dto:createProductDTO) {
-    return this.http.post<Product>(this.apiUrl, dto);	
+    return this.http.post<Product>(this.apiUrl+"/api/products/", dto);	
   }
 
 
@@ -75,7 +75,7 @@ private apiUrl = environment.api_url+"/api/products/";
   }
 
   getProductsByPage(limit:number, offset:number){
-    return this.http.get<Product[]>(this.apiUrl, {
+    return this.http.get<Product[]>(this.apiUrl+"/api/products/", {
       params:{limit,offset}
     });	
 
@@ -88,4 +88,25 @@ private apiUrl = environment.api_url+"/api/products/";
       this.update(dto,id)
     )
   }
-}
+
+
+  getByCategory(categoryId:string, limit?:number, offset?:number){
+    let params = new  HttpParams();
+    if(limit && offset){
+      params = params.set('limit', limit);
+      params = params.set('offset', offset)
+    }
+    
+    return this.http.get<Product[]>(this.apiUrl+"/api/categories/"+categoryId+"/products", {params, context:checktime()})
+    .pipe(
+      retry(3), //permite reiintentar la peticion hasta 3 veces antes del error 
+      map(products =>products.map(item =>{
+        return{
+          ...item,
+          taxes : .19 * item.price //agrego el nuevo valor con el map 
+        }
+      }))//map permite evaluar cada uno de los valores del observable para transformarlo 
+      );	
+  }
+  }
+

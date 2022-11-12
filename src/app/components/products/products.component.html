@@ -1,5 +1,6 @@
-<button (click)="createNewProduct()">Create</button>
-<button (click)="onShowDetail('45645646')">id no exist</button>
+<!-- <button (click)="createNewProduct()">Create</button>
+<button (click)="onShowDetail('45645646')">id no exist</button> -->
+
 <div class="products--grid">
   <app-product
     [product]="product"
@@ -7,8 +8,10 @@
     (addedProduct)="onAddToShoppingCart($event)"
     (showProduct)="onShowDetail($event)"
   ></app-product>
+
+  <button class="btn btn-danger" (click)="onLoadMore()">Cargar mas</button>
 </div>
-<button (click)="loadMore()">Cargar mas</button>
+
 
 
 <div *ngIf="productChosen"  class="product-detail" [class.active]="showProductDetail  ">
