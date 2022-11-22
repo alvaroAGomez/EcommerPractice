@@ -1,15 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
-import {
-  createProductDTO,
-  Product,
-  updateProductDTO,
-} from '../../models/product.model';
 
-import { StoreService } from '../../services/store.service';
-import { ProductsService } from '../../services/products.service';
 import { switchMap } from 'rxjs/operators';
 import { zip } from 'rxjs';
+import { Product, createProductDTO, updateProductDTO } from 'src/app/models/product.model';
+import { ProductsService } from 'src/app/services/products.service';
+import { StoreService } from 'src/app/services/store.service';
 
 @Component({
   selector: 'app-products',
@@ -22,6 +18,15 @@ export class ProductsComponent implements OnInit {
   total = 0;
   
   @Input() products: Product[] = [];
+  //@Input() productId: string | null =null;
+
+   @Input()
+   set productId(id:string|null){
+    if(id){
+      this.onShowDetail(id);
+    }
+   }
+  
   @Output() loadMore = new EventEmitter();
 
   showProductDetail: boolean = false;
@@ -49,9 +54,12 @@ export class ProductsComponent implements OnInit {
   }
 
   onShowDetail(id: String) {
+    if(!this.showProductDetail){
+      this.showProductDetail = true;
+    }
     this.productsService.getProduct(id).subscribe(
       (res) => {
-        this.toggleProductDetail();
+       
         this.productChosen = res;
       },
       (errorMsg) => {
@@ -60,6 +68,7 @@ export class ProductsComponent implements OnInit {
       }
     );
   }
+
 
   createNewProduct() {
     const product: createProductDTO = {

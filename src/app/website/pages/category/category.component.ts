@@ -15,6 +15,9 @@ export class CategoryComponent implements OnInit {
   offset = 0;
   products: Product[] = [];
 
+  productId : string|null= null;
+
+
   constructor(
     private activeRoute: ActivatedRoute,
     private productServices: ProductsService
@@ -38,6 +41,9 @@ export class CategoryComponent implements OnInit {
       .subscribe((res) => {
         this.products = res;
       });
+      this.activeRoute.queryParamMap.subscribe(params=>{
+        this.productId = params.get('product');
+      })
   }
 
   onLoadMore() {
