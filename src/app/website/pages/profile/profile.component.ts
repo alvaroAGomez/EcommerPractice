@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { User } from 'src/app/models/user.model';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-profile',
@@ -7,9 +9,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ProfileComponent implements OnInit {
 
-  constructor() { }
+  user:User|null  =null;
+  constructor(private svcAuth: AuthService) { }
 
   ngOnInit(): void {
+    this.svcAuth.User$.subscribe(res=>{ //como al loguear obtengo el perfil aqui ya no hace falta hacer la peticion a la api sino lo recupero del store global
+      this.user = res;
+    })
   }
 
 }

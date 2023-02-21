@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { Product } from './models/product.model';
 import { AuthService } from './services/auth.service';
 import { FilesService } from './services/files.service';
+import { TokenService } from './services/token.service';
 import { UsersService } from './services/users.service';
 
 @Component({
@@ -10,13 +11,24 @@ import { UsersService } from './services/users.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
   imgParent = '';
   showImg = true;
 token:string ="";
 
 imgRta:string ="";
-  constructor(private authService: AuthService, private userService: UsersService, private fileService: FilesService){}
+  constructor(private authService: AuthService, 
+    private userService: UsersService, 
+    private fileService: FilesService,
+    private tokenService: TokenService){}
+
+
+  ngOnInit(): void {
+    const token = this.tokenService.getToken();
+    if(token){
+      this.authService.getProfile().subscribe();
+    }
+  }
 
   onLoaded(img: string) {
     console.log('log padre', img);
@@ -30,7 +42,8 @@ imgRta:string ="";
     this.userService.create({
       name:"Alvaro",
       email:"alvaro@gmail.com",
-      password:"123456"
+      password:"123456",
+      role:"Customer"
     }).subscribe(res=>{
       console.log({res});
       
